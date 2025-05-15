@@ -1,0 +1,83 @@
+<div class="add-payment-method-container">
+  <h2 mat-dialog-title>Add Payment Method</h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Card Number</mat-label>
+          <input matInput formControlName="cardNumber" placeholder="1234 5678 9012 3456" maxlength="16">
+          <mat-error *ngIf="paymentForm.get('cardNumber')?.hasError('required')">
+            Card number is required
+          </mat-error>
+          <mat-error *ngIf="paymentForm.get('cardNumber')?.hasError('pattern')">
+            Please enter a valid 16-digit card number
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="expiry-month">
+          <mat-label>Month</mat-label>
+          <input matInput formControlName="expiryMonth" placeholder="MM" maxlength="2">
+          <mat-error *ngIf="paymentForm.get('expiryMonth')?.hasError('required')">
+            Month is required
+          </mat-error>
+          <mat-error *ngIf="paymentForm.get('expiryMonth')?.hasError('pattern')">
+            Please enter a valid month (01-12)
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="expiry-year">
+          <mat-label>Year</mat-label>
+          <input matInput formControlName="expiryYear" placeholder="YY" maxlength="2">
+          <mat-error *ngIf="paymentForm.get('expiryYear')?.hasError('required')">
+            Year is required
+          </mat-error>
+          <mat-error *ngIf="paymentForm.get('expiryYear')?.hasError('pattern')">
+            Please enter a valid year
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="cvc">
+          <mat-label>CVC</mat-label>
+          <input matInput formControlName="cvc" placeholder="123" maxlength="4">
+          <mat-error *ngIf="paymentForm.get('cvc')?.hasError('required')">
+            CVC is required
+          </mat-error>
+          <mat-error *ngIf="paymentForm.get('cvc')?.hasError('pattern')">
+            Please enter a valid CVC
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name on Card</mat-label>
+          <input matInput formControlName="name" placeholder="John Doe">
+          <mat-error *ngIf="paymentForm.get('name')?.hasError('required')">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-checkbox formControlName="isDefault">
+          Set as default payment method
+        </mat-checkbox>
+      </div>
+
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="loading">Cancel</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading || paymentForm.invalid">
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      <span *ngIf="!loading">Add Payment Method</span>
+    </button>
+  </mat-dialog-actions>
+</div> 

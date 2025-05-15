@@ -1,0 +1,14 @@
+<mat-card class="artwork-card">
+  <img mat-card-image [src]="artwork.imageUrl" [alt]="artwork.title">
+  <mat-card-content>
+    <h2>{{ artwork.title }}</h2>
+    <p class="artist">by {{ artwork.artist }}</p>
+    <p class="price">${{ artwork.price }}</p>
+    <p class="description">{{ artwork.description }}</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="onAddToCart()" [disabled]="!artwork.isAvailable">
+      Add to Cart
+    </button>
+  </mat-card-actions>
+</mat-card> 

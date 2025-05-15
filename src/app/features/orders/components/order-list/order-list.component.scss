@@ -1,0 +1,120 @@
+// Order List Component Styles
+:host {
+  display: block;
+}
+
+// Custom styles that can't be achieved with Tailwind utilities
+.order-card {
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Custom scrollbar for order items preview
+.order-items-preview {
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+    
+    &:hover {
+      background: #666;
+    }
+  }
+}
+
+// Custom focus styles for form elements
+.filter-form {
+  select:focus, 
+  input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
+}
+
+// Custom animation for status badges
+.status-badge {
+  padding: 0.75rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Order card styles
+.order-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+  
+  .order-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .order-items {
+    padding: 1.5rem;
+  }
+  
+  .order-actions {
+    padding: 1rem 1.5rem;
+    background-color: #f9fafb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+}
+
+// Filter form styles
+.filter-form {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  
+  .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+  }
+  
+  select, input {
+    width: 100%;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem;
+    
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    }
+  }
+} 
