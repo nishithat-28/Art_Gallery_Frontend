@@ -19,16 +19,25 @@ export class ErrorInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    console.log('Making request to:', request.url);
+    const token = localStorage.getItem('token');
+    console.log('Token present:', !!token);
+
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
+        console.log('Error occurred:', error.status, error.statusText);
+        console.log('Error details:', error.error);
+        
         let errorMessage = 'An error occurred';
         
         if (error.error instanceof ErrorEvent) {
           // Client-side error
           errorMessage = error.error.message;
+          console.log('Client-side error:', errorMessage);
         } else {
           // Server-side error
           if (error.status === 401) {
+            console.log('Unauthorized error - clearing token and redirecting to login');
             localStorage.removeItem('token');
             this.router.navigate(['/auth/login']);
             errorMessage = 'Session expired. Please login again.';
@@ -51,4 +60,4 @@ export class ErrorInterceptor implements HttpInterceptor {
       })
     );
   }
-} 
+}

@@ -69,7 +69,7 @@ export class CartComponent implements OnInit {
   }
 
   proceedToCheckout(): void {
-    this.router.navigate(['/checkout']);
+    this.router.navigate(['/cart/checkout']);
   }
 
   retryLoading(): void {

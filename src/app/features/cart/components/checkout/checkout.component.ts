@@ -262,7 +262,7 @@ export class CheckoutComponent implements OnInit {
       city: ['', Validators.required],
       state: ['', Validators.required],
       zipCode: ['', Validators.required],
-      country: ['US'],
+      country: ['India'],
       cardNumber: ['', [Validators.required, Validators.pattern('^[0-9]{16}$')]],
       expiryDate: ['', [Validators.required, Validators.pattern('^(0[1-9]|1[0-2])\\/([0-9]{2})$')]],
       cvv: ['', [Validators.required, Validators.pattern('^[0-9]{3,4}$')]]
@@ -296,41 +296,47 @@ export class CheckoutComponent implements OnInit {
   onSubmit(): void {
     if (this.checkoutForm.valid) {
       this.processing = true;
-      const orderData: CreateOrderDto = {
-        items: this.cartItems.map(item => ({
-          id: item.artwork.id.toString(),
-          price: item.artwork.price,
-          quantity: item.quantity,
-          title: item.artwork.title,
-          imageUrl: item.artwork.imageUrl
-        })),
-        shippingAddress: {
-          street: this.checkoutForm.get('street')?.value,
-          city: this.checkoutForm.get('city')?.value,
-          state: this.checkoutForm.get('state')?.value,
-          country: this.checkoutForm.get('country')?.value,
-          zipCode: this.checkoutForm.get('zipCode')?.value
-        }
+      const shippingAddress = {
+        firstName: this.checkoutForm.get('firstName')?.value,
+        lastName: this.checkoutForm.get('lastName')?.value,
+        email: this.checkoutForm.get('email')?.value,
+        street: this.checkoutForm.get('street')?.value,
+        city: this.checkoutForm.get('city')?.value,
+        state: this.checkoutForm.get('state')?.value,
+        country: this.checkoutForm.get('country')?.value,
+        zipCode: this.checkoutForm.get('zipCode')?.value
       };
 
-      this.orderService.createOrder(this.cartItems, this.checkoutForm.get('cardNumber')?.value).subscribe({
+      console.log('Submitting order with:', { cartItems: this.cartItems, shippingAddress });
+
+      this.orderService.createOrder(this.cartItems, shippingAddress).subscribe({
         next: (order: any) => {
+          console.log('Order created successfully:', order);
           this.cartService.clearCart().subscribe(() => {
             this.snackBar.open('Order placed successfully!', 'Close', {
               duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
+              horizontalPosition: 'end',
+              verticalPosition: 'top'
+            });
+            this.router.navigate(['/orders', order.id]);
           });
-          this.router.navigate(['/orders', order.id]);
-        });
-      },
-      error: (error: Error) => {
-          console.error('Error creating order:', error);
-          this.snackBar.open('Error placing order. Please try again.', 'Close', {
-            duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
+        },
+        error: (error: any) => {
+          console.error('Error creating order:', {
+            error,
+            status: error?.status,
+            message: error?.message,
+            errorResponse: error?.error
           });
+          this.snackBar.open(
+            error?.error?.message || 'Error placing order. Please try again.',
+            'Close',
+            {
+              duration: 5000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top'
+            }
+          );
           this.processing = false;
         }
       });

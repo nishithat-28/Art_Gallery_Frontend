@@ -8,7 +8,7 @@ import { Artwork, ArtworkFilters } from '../models/artwork.model';
   providedIn: 'root'
 })
 export class ArtworkService {
-  private apiUrl = `${environment.apiUrl}/artworks`;
+  private apiUrl = `${environment.apiUrl}/artwork`;
 
   constructor(private http: HttpClient) {}
 

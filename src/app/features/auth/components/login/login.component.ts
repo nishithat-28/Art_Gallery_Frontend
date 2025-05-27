@@ -80,7 +80,7 @@ export class LoginComponent {
       const { email, password } = this.loginForm.value;
       this.authService.login(email, password).subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/checkout']);
         },
         error: (error) => {
           console.error('Login failed:', error);
