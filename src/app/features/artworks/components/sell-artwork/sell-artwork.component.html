@@ -1,0 +1,43 @@
+<div class="sell-artwork-container">
+    <h2>Sell Your Artwork</h2>
+    <form [formGroup]="artworkForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+      <div>
+        <label>Title</label>
+        <input type="text" formControlName="title" />
+      </div>
+      <div>
+        <label>Artist</label>
+        <input type="text" formControlName="artist" />
+      </div>
+      <div>
+        <label>Description</label>
+        <textarea formControlName="description"></textarea>
+      </div>
+      <div>
+        <label>Price</label>
+        <input type="number" formControlName="price" />
+      </div>
+      <div>
+        <label>Year</label>
+        <input type="number" formControlName="year" />
+      </div>
+      <div>
+        <label>Medium</label>
+        <input type="text" formControlName="medium" />
+      </div>
+      <div>
+        <label>Dimensions</label>
+        <input type="text" formControlName="dimensions" />
+      </div>
+      <div>
+        <label>Category ID</label>
+        <input type="number" formControlName="categoryId" />
+      </div>
+      <div>
+        <label>Upload Image</label>
+        <input type="file" (change)="onFileChange($event)" />
+      </div>
+      <button type="submit" [disabled]="artworkForm.invalid || !imageFile">Submit</button>
+    </form>
+  </div>
+  

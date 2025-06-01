@@ -64,18 +64,7 @@ export class ArtworkService {
   }
 
   // POST: api/ArtWork
-  createArtwork(artwork: CreateArtWorkDto): Observable<Artwork> {
-    const formData = new FormData();
-    formData.append('title', artwork.title);
-    formData.append('artist', artwork.artist);
-    formData.append('description', artwork.description);
-    formData.append('price', artwork.price.toString());
-    formData.append('year', artwork.year.toString());
-    formData.append('medium', artwork.medium);
-    formData.append('dimensions', artwork.dimensions);
-    formData.append('categoryId', artwork.categoryId.toString());
-    formData.append('imageFile', artwork.imageFile);
-
+  createArtwork(formData: FormData): Observable<Artwork> {
     return this.http.post<Artwork>(this.apiUrl, formData);
   }
 

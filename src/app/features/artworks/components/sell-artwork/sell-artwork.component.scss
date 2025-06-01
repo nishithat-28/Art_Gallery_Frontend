@@ -1,0 +1,40 @@
+.sell-artwork-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+  
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    form div {
+      margin-bottom: 12px;
+  
+      label {
+        display: block;
+        font-weight: 500;
+      }
+  
+      input, textarea {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+    }
+  
+    button {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  }
+  

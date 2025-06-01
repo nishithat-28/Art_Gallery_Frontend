@@ -11,8 +11,10 @@ import { Router } from '@angular/router';
           
           <div class="flex items-center space-x-4">
             <a routerLink="/artworks" class="text-gray-600 hover:text-gray-900">Browse Art</a>
+            <a routerLink="/artworks/sell-artwork" class="text-gray-600 hover:text-gray-900">Sell Art</a>
             <a routerLink="/orders" class="text-gray-600 hover:text-gray-900">Orders</a>
             <a routerLink="/cart" class="text-gray-600 hover:text-gray-900">Cart</a>
+
             
             <ng-container *ngIf="isLoggedIn; else authButtons">
               <a routerLink="/admin" class="text-gray-600 hover:text-gray-900">Admin</a>
