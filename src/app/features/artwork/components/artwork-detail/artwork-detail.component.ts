@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ArtworkService, Artwork } from '../../../../core/services/artwork.service';
+import { ArtworkService} from '../../../../core/services/artwork.service';
 import { CartService } from '../../../../core/services/cart.service';
+import { Artwork } from 'src/app/core/models/artwork.model';
 
 @Component({
   selector: 'app-artwork-detail',
@@ -111,7 +112,7 @@ export class ArtworkDetailComponent implements OnInit {
     this.loading = true;
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.artworkService.getArtworkById(id).subscribe({
+    this.artworkService.getArtwork(id).subscribe({
       next: (artwork: Artwork) => {
         this.artwork = artwork;
         this.loading = false;
@@ -132,7 +133,7 @@ export class ArtworkDetailComponent implements OnInit {
 
   addToCart(): void {
     if (this.artwork) {
-      this.cartService.addToCart(this.artwork, this.quantity);
+      this.cartService.addToCart(this.artwork);
       this.snackBar.open('Added to cart', 'Close', {
         duration: 3000,
         horizontalPosition: 'end',

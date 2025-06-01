@@ -1,5 +1,5 @@
 <mat-card class="artwork-card">
-  <img mat-card-image [src]="artwork.imageUrl" [alt]="artwork.title">
+  <img mat-card-image [src]="artworkImageUrl" [alt]="artwork.title" />
   <mat-card-content>
     <h2>{{ artwork.title }}</h2>
     <p class="artist">by {{ artwork.artist }}</p>
@@ -8,7 +8,7 @@
   </mat-card-content>
   <mat-card-actions>
     <button mat-raised-button color="primary" (click)="onAddToCart()" [disabled]="!artwork.isAvailable">
-      Add to Cart
+      {{ artwork.isAvailable ? 'Add to Cart' : 'Sold Out' }}
     </button>
   </mat-card-actions>
-</mat-card> 
+</mat-card>

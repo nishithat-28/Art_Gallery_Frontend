@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../../../../shared/shared.module';
 import { ArtworkDetailsComponent } from './artwork-details.component';
+import { ArtworkService } from 'src/app/core/services/artwork.service';
 
 const routes: Routes = [
   {
@@ -21,4 +22,7 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ]
 })
-export class ArtworkDetailsModule { } 
+export class ArtworkDetailsModule { 
+  
+
+} 
