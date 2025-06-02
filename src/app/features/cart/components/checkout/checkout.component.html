@@ -197,8 +197,7 @@
         
         <div class="space-y-4">
           <div *ngFor="let item of cartItems" class="flex items-center py-2 border-b">
-            <img [src]="item.artwork.imageUrl" [alt]="item.artwork.title" class="w-16 h-16 object-cover rounded-md">
-            <div class="ml-4 flex-grow">
+            <img mat-card-image [src]="item.imageUrl || fallbackImageUrl" [alt]="item.artwork.title" />            <div class="ml-4 flex-grow">
               <h3 class="text-sm font-medium text-gray-900">{{item.artwork.title}}</h3>
               <p class="text-sm text-gray-500">Qty: {{item.quantity}}</p>
             </div>

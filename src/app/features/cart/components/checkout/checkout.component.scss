@@ -68,6 +68,7 @@ button {
 }
 
 // Image styles
+/**
 img {
   transition: transform 0.2s ease-in-out;
 
@@ -75,3 +76,9 @@ img {
     transform: scale(1.05);
   }
 } 
+**/
+img {
+  width: 50%;
+  height: 50%;
+  object-fit: cover;
+}

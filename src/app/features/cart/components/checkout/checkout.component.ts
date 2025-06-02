@@ -6,6 +6,8 @@ import { CartService, CartItem } from '../../../../core/services/cart.service';
 import { OrderService } from '../../../../core/services/order.service';
 import { OrderResponseDto } from '../../../../core/models/order.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ArtworkService } from 'src/app/core/services/artwork.service';
 
 @Component({
   selector: 'app-checkout',
@@ -13,18 +15,23 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./checkout.component.scss']
 })
 export class CheckoutComponent implements OnInit {
-  cartItems: CartItem[] = [];
+  cartItems: any[] = [];
   cartTotal = 0;
   checkoutForm: FormGroup;
   loading = false;
   processing = false;
+  error: string | null = null;
+
+  fallbackImageUrl: SafeUrl = 'https://media.istockphoto.com/id/2173059563/vector/coming-soon-image-on-white-background-no-photo-available.jpg?s=612x612&w=0&k=20&c=v0a_B58wPFNDPULSiw_BmPyhSNCyrP_d17i2BPPyDTk=';
 
   constructor(
     private cartService: CartService,
     private orderService: OrderService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private sanitizer: DomSanitizer,
+    private artworkService: ArtworkService
   ) {
     this.checkoutForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -44,13 +51,26 @@ export class CheckoutComponent implements OnInit {
   ngOnInit(): void {
     this.loadCart();
   }
-
+  
+  private loadArtworkImage(item: any): void {
+    this.artworkService.getArtworkImage(item.artwork.id).subscribe({
+      next: (blob) => {
+        const objectURL = URL.createObjectURL(blob);
+        item.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectURL);
+      },
+      error: () => {
+        console.warn(`Failed to load image for artwork ID: ${item.artwork.id}`);
+        item.imageUrl = this.fallbackImageUrl;
+      }
+    });
+  }
   private loadCart(): void {
     this.loading = true;
     this.cartService.getCartItems().subscribe({
       next: (items: CartItem[]) => {
         this.cartItems = items;
         this.cartTotal = this.cartService.getCartTotal();
+        this.cartItems.forEach(item => this.loadArtworkImage(item));
         this.loading = false;
       },
       error: (error: unknown) => {

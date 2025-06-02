@@ -27,7 +27,7 @@
         <div class="item-details">
           <h3>{{ item.artwork.title }}</h3>
           <p>by {{ item.artwork.artist }}</p>
-          <p class="price">${{ item.artwork.price | number:'1.2-2' }}</p>
+          <p class="price">₹{{ item.artwork.price | number:'1.2-2' }}</p>
           <div class="quantity">
             <button mat-icon-button (click)="updateQuantity(item.artwork.id, item.quantity - 1)">
               <mat-icon>remove</mat-icon>
@@ -48,7 +48,7 @@
       <h2>Order Summary</h2>
       <div class="summary-row">
         <span>Total</span>
-        <span>${{ cartTotal | number:'1.2-2' }}</span>
+        <span>₹{{ cartTotal | number:'1.2-2' }}</span>
       </div>
       <button mat-raised-button color="primary" (click)="proceedToCheckout()">
         Proceed to Checkout
