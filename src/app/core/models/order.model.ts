@@ -1,27 +1,56 @@
 import { Artwork } from './artwork.model';
 
-export interface Order {
+export interface OrderResponseDto {
   id: number;
   userId: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  username: string;
+  orderDate: Date;
   totalAmount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  items: OrderItem[];
-  shippingAddress: Address;
-  trackingNumber?: string;
-  estimatedDeliveryDate?: Date;
-  trackingHistory?: TrackingEvent[];
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  shippingAddress: string;
+  paymentMethod: string;
+  invoiceNumber: string;
+  orderItems: OrderItemResponseDto[];
 }
 
-export interface OrderItem {
+export interface OrderItemResponseDto {
   id: number;
-  orderId: number;
-  artworkId: number;
-  quantity: number;
+  artWorkId: number;
+  artWorkTitle: string;
+  artWorkArtist: string;
   price: number;
-  artwork: Artwork;
+  quantity: number;
+  subtotal: number;
 }
+
+export interface OrderCreateDto {
+  userId: number;
+  shippingAddress: string;
+  paymentMethod: string;
+  orderItems: OrderItemDto[];
+}
+
+export interface OrderItemDto {
+  artWorkId: number;
+  quantity: number;
+}
+
+export interface InvoiceDto {
+  invoiceNumber: string;
+  invoiceDate: Date;
+  customerName: string;
+  customerEmail: string;
+  shippingAddress: string;
+  paymentMethod: string;
+  items: OrderItemResponseDto[];
+  subtotal: number;
+  tax: number;
+  total: number;
+}
+
+// For backward compatibility and type safety
+export type Order = OrderResponseDto;
+export type OrderItem = OrderItemResponseDto;
 
 export interface Address {
   street: string;

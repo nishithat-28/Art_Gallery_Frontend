@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { OrderService, Order } from '../../../../core/services/order.service';
-import { OrderItem } from '../../../../core/models/order.model';
-import { Artwork } from '../../../../core/models/artwork.model';
+import { OrderService } from '../../../../core/services/order.service';
+import { OrderResponseDto, OrderItemResponseDto } from '../../../../core/models/order.model';
 
 type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
-type StatusFilter = Order['status'] | 'all';
+type StatusFilter = OrderResponseDto['status'] | 'all';
 
 @Component({
   selector: 'app-order-list',
@@ -15,8 +14,8 @@ type StatusFilter = Order['status'] | 'all';
   styleUrls: ['./order-list.component.scss']
 })
 export class OrderListComponent implements OnInit {
-  orders: Order[] = [];
-  filteredOrders: Order[] = [];
+  orders: OrderResponseDto[] = [];
+  filteredOrders: OrderResponseDto[] = [];
   loading = false;
   filterForm: FormGroup;
   error: string | null = null;
@@ -24,12 +23,12 @@ export class OrderListComponent implements OnInit {
   sortBy: 'date' | 'amount' = 'date';
   sortDirection: 'asc' | 'desc' = 'desc';
 
-  private readonly statusClasses: Record<Order['status'], string> = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    processing: 'bg-blue-100 text-blue-800',
-    shipped: 'bg-purple-100 text-purple-800',
-    delivered: 'bg-green-100 text-green-800',
-    cancelled: 'bg-red-100 text-red-800'
+  private readonly statusClasses: Record<OrderResponseDto['status'], string> = {
+    'Pending': 'bg-yellow-100 text-yellow-800',
+    'Processing': 'bg-blue-100 text-blue-800',
+    'Shipped': 'bg-purple-100 text-purple-800',
+    'Delivered': 'bg-green-100 text-green-800',
+    'Cancelled': 'bg-red-100 text-red-800'
   };
 
   constructor(
@@ -57,15 +56,19 @@ export class OrderListComponent implements OnInit {
 
   private loadOrders(): void {
     this.loading = true;
-    this.orderService.getUserOrders().subscribe({
+    this.error = null;
+    
+    this.orderService.getOrders().subscribe({
       next: (orders) => {
+        console.log('Orders loaded successfully:', orders);
         this.orders = orders;
         this.applyFilters();
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading orders:', error);
-        this.snackBar.open('Error loading orders. Please try again.', 'Close', {
+        this.error = 'Error loading orders. Please try again.';
+        this.snackBar.open(this.error, 'Close', {
           duration: 5000,
           horizontalPosition: 'end',
           verticalPosition: 'top'
@@ -90,7 +93,7 @@ export class OrderListComponent implements OnInit {
       const days = parseInt(dateRange);
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
-      filtered = filtered.filter(order => new Date(order.createdAt) >= cutoffDate);
+      filtered = filtered.filter(order => new Date(order.orderDate) >= cutoffDate);
     }
 
     // Apply search filter
@@ -98,7 +101,7 @@ export class OrderListComponent implements OnInit {
     if (search) {
       filtered = filtered.filter(order => 
         order.id.toString().includes(search) ||
-        order.items.some(item => item.artwork.title.toLowerCase().includes(search))
+        order.orderItems.some(item => item.artWorkTitle.toLowerCase().includes(search))
       );
     }
 
@@ -107,13 +110,13 @@ export class OrderListComponent implements OnInit {
     filtered.sort((a, b) => {
       switch (sort) {
         case 'date-desc':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
         case 'date-asc':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime();
         case 'amount-desc':
-          return this.getOrderTotal(b) - this.getOrderTotal(a);
+          return b.totalAmount - a.totalAmount;
         case 'amount-asc':
-          return this.getOrderTotal(a) - this.getOrderTotal(b);
+          return a.totalAmount - b.totalAmount;
         default:
           return 0;
       }
@@ -131,119 +134,21 @@ export class OrderListComponent implements OnInit {
     });
   }
 
-  cancelOrder(order: Order): void {
-    if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(order.id.toString()).subscribe({
-        next: (updatedOrder) => {
-          const index = this.orders.findIndex(o => o.id === order.id);
-          if (index !== -1) {
-            this.orders[index] = updatedOrder;
-            this.applyFilters();
-          }
-          this.snackBar.open('Order cancelled successfully.', 'Close', {
-            duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
-          });
-        },
-        error: (error) => {
-          console.error('Error cancelling order:', error);
-          this.snackBar.open('Error cancelling order. Please try again.', 'Close', {
-            duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
-          });
-        }
-      });
-    }
-  }
-
-  getStatusClass(status: Order['status']): string {
+  getStatusClass(status: OrderResponseDto['status']): string {
     return this.statusClasses[status] || 'bg-gray-100 text-gray-800';
   }
 
-  getOrderTotal(order: Order): number {
-    return order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  getOrderTotal(order: OrderResponseDto): number {
+    return order.totalAmount;
   }
 
-  exportOrders(): void {
-    const ordersToExport = this.filteredOrders;
-    if (ordersToExport.length === 0) {
-      this.snackBar.open('No orders to export.', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top'
-      });
-      return;
-    }
-
-    // Create CSV content
-    const headers = [
-      'Order ID',
-      'Date',
-      'Status',
-      'Total Amount',
-      'Items',
-      'Shipping Address'
-    ];
-
-    const rows = ordersToExport.map(order => [
-      order.id.toString(),
-      new Date(order.createdAt).toLocaleString(),
-      order.status,
-      this.getOrderTotal(order).toString(),
-      order.items.map(item => `${item.artwork.title} (${item.quantity})`).join('; '),
-      order.shippingAddress
-    ]);
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n');
-
-    // Create and download file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `orders-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  filterOrders(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredOrders = [...this.orders];
-    } else {
-      const search = this.searchTerm.toLowerCase().trim();
-      this.filteredOrders = this.orders.filter(order => 
-        order.id.toString().includes(search) ||
-        order.status.toLowerCase().includes(search) ||
-        order.items.some((item: OrderItem) => item.artwork.title.toLowerCase().includes(search))
-      );
-    }
-    this.sortOrders();
-  }
-
-  sortOrders(): void {
-    this.filteredOrders.sort((a: Order, b: Order) => {
-      if (this.sortBy === 'date') {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
-        return this.sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
-      } else {
-        return this.sortDirection === 'desc' ? 
-          b.totalAmount - a.totalAmount : 
-          a.totalAmount - b.totalAmount;
-      }
-    });
-  }
-
-  getOrderItemsSummary(order: Order): string {
-    return order.items.map((item: OrderItem) => 
-      `${item.artwork.title} (${item.quantity})`
+  getOrderItemsSummary(order: OrderResponseDto): string {
+    return order.orderItems.map(item => 
+      `${item.artWorkTitle} (${item.quantity})`
     ).join('; ');
+  }
+
+  viewInvoice(order: OrderResponseDto): void {
+    this.router.navigate(['/orders', order.id, 'invoice']);
   }
 } 

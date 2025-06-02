@@ -11,12 +11,12 @@ const routes: Routes = [
   {
     path: '',
     component: OrderListComponent,
-    canActivate: [AuthGuard]
+    //canActivate: [AuthGuard]
   },
   {
     path: ':id',
     component: OrderDetailsComponent,
-    canActivate: [AuthGuard]
+    //canActivate: [AuthGuard]
   }
 ];
 

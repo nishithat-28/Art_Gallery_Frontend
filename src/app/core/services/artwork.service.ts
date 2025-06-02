@@ -26,7 +26,6 @@ export interface UpdateArtWorkDto {
   medium: string;
   dimensions: string;
   categoryId: number;
-  isAvailable: boolean;
   imageFile?: File;
 }
 
@@ -80,7 +79,6 @@ export class ArtworkService {
     formData.append('medium', artwork.medium);
     formData.append('dimensions', artwork.dimensions);
     formData.append('categoryId', artwork.categoryId.toString());
-    formData.append('isAvailable', artwork.isAvailable.toString());
     if (artwork.imageFile) {
       formData.append('imageFile', artwork.imageFile);
     }
@@ -111,7 +109,6 @@ export class ArtworkService {
         category: 'Abstract',
         categoryId: 1,
         artistId: 1,
-        isAvailable: true,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -125,7 +122,6 @@ export class ArtworkService {
         category: 'Landscape',
         categoryId: 2,
         artistId: 2,
-        isAvailable: true,
         createdAt: new Date(),
         updatedAt: new Date()
       }

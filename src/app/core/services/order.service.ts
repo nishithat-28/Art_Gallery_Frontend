@@ -1,9 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CartItem } from './cart.service';
-import { Order, OrderItem, TrackingEvent } from '../models/order.model';
+import { 
+  Order, 
+  OrderCreateDto, 
+  OrderItemDto, 
+  OrderResponseDto, 
+  InvoiceDto, 
+  TrackingEvent
+} from '../models/order.model';
+import { AuthService } from './auth.service';
 
 // Re-export types
 export type { Order, TrackingEvent };
@@ -40,27 +48,58 @@ export interface CreateOrderDto {
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = `${environment.apiUrl}/Orders`;
+  private apiUrl = `${environment.apiUrl}/Order`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-  createOrder(cartItems: CartItem[], shippingAddress: CreateOrderDto['shippingAddress']): Observable<Order> {
-    const orderItems = this.mapCartItemsToOrderItems(cartItems);
+  createOrder(cartItems: CartItem[], shippingAddress: string, paymentMethod: string): Observable<OrderResponseDto> {
+    return this.authService.currentUser$.pipe(
+      switchMap(user => {
+        if (!user?.id) {
+          throw new Error('User not authenticated');
+        }
 
-    const orderData: CreateOrderDto = {
-      items: orderItems,
-      shippingAddress
-    };
+        const orderItems: OrderItemDto[] = cartItems.map(item => ({
+          artWorkId: item.artwork.id,
+          quantity: item.quantity
+        }));
 
-    return this.http.post<Order>(this.apiUrl, orderData);
+        const orderData: OrderCreateDto = {
+          userId: parseInt(user.id),
+          shippingAddress,
+          paymentMethod,
+          orderItems
+        };
+
+        return this.http.post<OrderResponseDto>(this.apiUrl, orderData);
+      })
+    );
   }
 
-  getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.apiUrl);
+  getOrders(): Observable<OrderResponseDto[]> {
+    return this.http.get<OrderResponseDto[]>(this.apiUrl);
   }
 
-  getOrder(id: string): Observable<Order> {
-    return this.http.get<Order>(`${this.apiUrl}/${id}`);
+  getOrder(id: number): Observable<OrderResponseDto> {
+    return this.http.get<OrderResponseDto>(`${this.apiUrl}/${id}`);
+  }
+
+  getInvoice(id: number): Observable<InvoiceDto> {
+    return this.http.get<InvoiceDto>(`${this.apiUrl}/invoice/${id}`);
+  }
+
+  // Helper method to format shipping address
+  formatShippingAddress(address: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    zipCode: string;
+  }): string {
+    return `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, ${address.country}`;
   }
 
   cancelOrder(id: string): Observable<Order> {
@@ -83,12 +122,12 @@ export class OrderService {
     events.push({
       status: 'Order Placed',
       location: 'Online Store',
-      timestamp: new Date(order.createdAt),
+      timestamp: new Date(order.orderDate),
       description: 'Your order has been placed successfully'
     });
 
     // Processing
-    const processingDate = new Date(order.createdAt);
+    const processingDate = new Date(order.orderDate);
     processingDate.setHours(processingDate.getHours() + 2);
     events.push({
       status: 'Processing',
@@ -98,23 +137,23 @@ export class OrderService {
     });
 
     // Shipped
-    if (order.status === 'shipped' || order.status === 'delivered') {
+    if (order.status === 'Shipped' || order.status === 'Delivered') {
       const shippedDate = new Date(processingDate);
       shippedDate.setDate(shippedDate.getDate() + 1);
       events.push({
         status: 'Shipped',
         location: 'Shipping Center',
         timestamp: shippedDate,
-        description: `Your order has been shipped. Tracking number: ${order.trackingNumber || 'N/A'}`
+        description: `Your order has been shipped.`
       });
 
       // Delivered
-      if (order.status === 'delivered') {
+      if (order.status === 'Delivered') {
         const deliveredDate = new Date(shippedDate);
         deliveredDate.setDate(deliveredDate.getDate() + 2);
         events.push({
           status: 'Delivered',
-          location: order.shippingAddress.city,
+          location: order.shippingAddress,
           timestamp: deliveredDate,
           description: 'Your order has been delivered'
         });
@@ -122,8 +161,8 @@ export class OrderService {
     }
 
     // Cancelled
-    if (order.status === 'cancelled') {
-      const cancelledDate = new Date(order.createdAt);
+    if (order.status === 'Cancelled') {
+      const cancelledDate = new Date(order.orderDate);
       cancelledDate.setHours(cancelledDate.getHours() + 1);
       events.push({
         status: 'Cancelled',

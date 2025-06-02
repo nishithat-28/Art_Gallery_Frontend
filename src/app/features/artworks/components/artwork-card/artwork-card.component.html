@@ -7,8 +7,8 @@
     <p class="description">{{ artwork.description }}</p>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-raised-button color="primary" (click)="onAddToCart()" [disabled]="!artwork.isAvailable">
-      {{ artwork.isAvailable ? 'Add to Cart' : 'Sold Out' }}
+    <button mat-raised-button color="primary" (click)="onAddToCart()">
+      Add to Cart
     </button>
   </mat-card-actions>
 </mat-card>

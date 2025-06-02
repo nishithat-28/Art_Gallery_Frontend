@@ -1,151 +1,137 @@
 <!-- Order List Component Template -->
 <div class="container mx-auto px-4 py-8">
-  <div class="flex justify-between items-center mb-8">
+  <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-gray-900">My Orders</h1>
-    <button
-      *ngIf="!loading && orders.length > 0"
-      class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200"
-      (click)="exportOrders()"
-    >
-      Export Orders
-    </button>
+    <div class="flex space-x-4">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="resetFilters()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Reset Filters
+      </button>
+    </div>
   </div>
 
+  <!-- Loading Spinner -->
   <div *ngIf="loading" class="flex justify-center items-center py-8">
     <mat-spinner diameter="40"></mat-spinner>
   </div>
 
-  <div *ngIf="!loading && orders.length === 0" class="text-center py-8">
-    <p class="text-gray-500 text-lg">You haven't placed any orders yet.</p>
-    <button
-      class="mt-4 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-      routerLink="/artworks"
-    >
-      Start Shopping
-    </button>
+  <!-- Error Message -->
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <span class="block sm:inline">{{ error }}</span>
   </div>
 
-  <div *ngIf="!loading && orders.length > 0" class="space-y-6">
-    <!-- Filters and Sort -->
-    <div class="filter-form bg-white rounded-lg shadow-md p-4">
-      <form [formGroup]="filterForm" class="flex flex-wrap gap-4 items-end">
-        <!-- Status Filter -->
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select
-            formControlName="status"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
+  <!-- Filters -->
+  <div *ngIf="!loading && !error" class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <select
+          formControlName="status"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option value="all">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Processing">Processing</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
 
-        <!-- Date Range -->
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-          <select
-            formControlName="dateRange"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="all">All Time</option>
-            <option value="7">Last 7 Days</option>
-            <option value="30">Last 30 Days</option>
-            <option value="90">Last 90 Days</option>
-            <option value="365">Last Year</option>
-          </select>
-        </div>
+      <!-- Date Range Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+        <select
+          formControlName="dateRange"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option value="all">All Time</option>
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+        </select>
+      </div>
 
-        <!-- Sort -->
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
-          <select
-            formControlName="sort"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="date-desc">Newest First</option>
-            <option value="date-asc">Oldest First</option>
-            <option value="amount-desc">Highest Amount</option>
-            <option value="amount-asc">Lowest Amount</option>
-          </select>
-        </div>
+      <!-- Sort Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+        <select
+          formControlName="sort"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+          <option value="date-desc">Newest First</option>
+          <option value="date-asc">Oldest First</option>
+          <option value="amount-desc">Highest Amount</option>
+          <option value="amount-asc">Lowest Amount</option>
+        </select>
+      </div>
 
-        <!-- Search -->
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-          <input
-            type="text"
-            formControlName="search"
-            placeholder="Search by order ID or item name"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-        </div>
-      </form>
+      <!-- Search Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+        <input
+          type="text"
+          formControlName="search"
+          placeholder="Search orders..."
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+        >
+      </div>
+    </form>
+  </div>
+
+  <!-- Orders List -->
+  <div *ngIf="!loading && !error" class="space-y-4">
+    <div *ngIf="filteredOrders.length === 0" class="text-center py-8">
+      <p class="text-gray-500 text-lg">No orders found.</p>
     </div>
 
-    <!-- Orders List -->
-    <div class="space-y-6">
-      <div *ngFor="let order of filteredOrders" class="order-card bg-white rounded-lg shadow-md overflow-hidden">
-        <!-- Order Header -->
-        <div class="p-6 border-b">
-          <div class="flex justify-between items-start">
-            <div>
-              <h2 class="text-xl font-semibold text-gray-900">Order #{{order.id}}</h2>
-              <p class="text-gray-500 mt-1">Placed on {{order.createdAt | date:'medium'}}</p>
-            </div>
-            <div class="text-right">
-              <span [class]="'status-badge px-3 py-1 rounded-full text-sm font-medium ' + getStatusClass(order.status)">
-                {{order.status | titlecase}}
-              </span>
-              <p class="text-gray-900 font-medium mt-2">{{getOrderTotal(order) | currency}}</p>
-            </div>
-          </div>
+    <div *ngFor="let order of filteredOrders" class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Order #{{ order.id }}</h2>
+          <p class="text-sm text-gray-500">Placed on {{ order.orderDate | date:'medium' }}</p>
         </div>
-
-        <!-- Order Items Preview -->
-        <div class="p-6">
-          <div class="order-items-preview flex space-x-4 overflow-x-auto pb-4">
-            <div *ngFor="let item of order.items.slice(0, 3)" class="flex-shrink-0">
-              <img [src]="item.artwork.imageUrl" [alt]="item.artwork.title" class="w-20 h-20 object-cover rounded-md">
-            </div>
-            <div *ngIf="order.items.length > 3" class="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-md flex items-center justify-center">
-              <span class="text-gray-500">+{{order.items.length - 3}} more</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Order Actions -->
-        <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-4">
-          <button
-            *ngIf="order.status === 'pending'"
-            class="text-red-600 hover:text-red-700 font-medium transition-colors duration-200"
-            (click)="cancelOrder(order)"
-          >
-            Cancel Order
-          </button>
-          <button
-            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-            [routerLink]="['/orders', order.id]"
-          >
-            View Details
-          </button>
+        <div class="mt-2 md:mt-0">
+          <span [class]="'px-3 py-1 rounded-full text-sm font-medium ' + getStatusClass(order.status)">
+            {{ order.status }}
+          </span>
         </div>
       </div>
-    </div>
 
-    <!-- No Results -->
-    <div *ngIf="filteredOrders.length === 0" class="text-center py-8">
-      <p class="text-gray-500 text-lg">No orders match your filters.</p>
-      <button
-        class="mt-4 text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
-        (click)="resetFilters()"
-      >
-        Reset Filters
-      </button>
+      <div class="border-t border-gray-200 pt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="text-sm font-medium text-gray-700">Items</h3>
+            <p class="mt-1 text-sm text-gray-900">{{ getOrderItemsSummary(order) }}</p>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-gray-700">Shipping Address</h3>
+            <p class="mt-1 text-sm text-gray-900">{{ order.shippingAddress }}</p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h3 class="text-sm font-medium text-gray-700">Total Amount</h3>
+            <p class="mt-1 text-lg font-semibold text-gray-900">{{ order.totalAmount | currency }}</p>
+          </div>
+          <div class="mt-4 md:mt-0 flex space-x-4">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="viewInvoice(order)"
+              class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              View Invoice
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div> 

@@ -8,7 +8,6 @@ export interface Artwork {
   category: string;
   categoryId: number;
   artistId: number;
-  isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
