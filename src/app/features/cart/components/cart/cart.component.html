@@ -22,7 +22,7 @@
     <div class="cart-items">
       <div *ngFor="let item of cartItems" class="cart-item">
         <div class="item-image">
-          <img [src]="item.artwork.imageUrl" [alt]="item.artwork.title">
+          <img mat-card-image [src]="item.imageUrl || fallbackImageUrl" [alt]="item.artwork.title" />
         </div>
         <div class="item-details">
           <h3>{{ item.artwork.title }}</h3>

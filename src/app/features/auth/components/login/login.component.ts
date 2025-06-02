@@ -23,14 +23,14 @@ import { AuthService } from '../../../../core/auth/auth.service';
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
           <div class="rounded-md shadow-sm -space-y-px">
             <div>
-              <label for="email" class="sr-only">Email address</label>
+              <label for="username" class="sr-only">Username</label>
               <input
-                id="email"
-                formControlName="email"
-                type="email"
+                id="username"
+                formControlName="username"
+                type="text"
                 required
                 class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder="Username"
               >
             </div>
             <div>
@@ -70,20 +70,21 @@ export class LoginComponent {
     private router: Router
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-      this.authService.login(email, password).subscribe({
+      const { username, password } = this.loginForm.value;
+      this.authService.login(username, password).subscribe({
         next: () => {
-          this.router.navigate(['/checkout']);
+          this.router.navigate(['/artworks']);
         },
         error: (error) => {
           console.error('Login failed:', error);
+          // Consider adding user feedback here (e.g., using MatSnackBar)
         }
       });
     }
