@@ -23,7 +23,7 @@ import { AuthService, User } from 'src/app/core/services/auth.service';
             </ng-container>
             
             <ng-template #authButtons>
-              <a routerLink="/auth/login" class="text-gray-600 hover:text-gray-900">Login</a>
+              <a routerLink="/auth/login" class="text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-blue-500 rounded-md px-4 py-2">Login</a>
               <a routerLink="/auth/register" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                 Sign Up
               </a>
