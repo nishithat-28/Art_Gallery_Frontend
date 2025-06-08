@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService, User } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -16,9 +17,9 @@ import { Router } from '@angular/router';
             <a routerLink="/cart" class="text-gray-600 hover:text-gray-900">Cart</a>
 
             
-            <ng-container *ngIf="isLoggedIn; else authButtons">
-              <a routerLink="/admin" class="text-gray-600 hover:text-gray-900">Admin</a>
-              <button (click)="logout()" class="text-gray-600 hover:text-gray-900">Logout</button>
+            <ng-container *ngIf="currentUser; else authButtons">
+              <a routerLink="/profile" class="text-gray-600 hover:text-gray-900">{{ currentUser.firstName || 'User' }}'s<br>profile</a>
+              <button (click)="logout()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">Logout</button>
             </ng-container>
             
             <ng-template #authButtons>
@@ -36,14 +37,21 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent {
   isLoggedIn = false;
+  currentUser: User | null = null;
 
-  constructor(private router: Router) {
-    this.isLoggedIn = !!localStorage.getItem('token');
+  constructor(
+    private router: Router,
+    private authService: AuthService) {
+  }
+
+  ngOnInit(): void {
+    // this.isLoggedIn = !!localStorage.getItem('token');
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
   }
 
   logout() {
-    localStorage.removeItem('token');
-    this.isLoggedIn = false;
-    this.router.navigate(['/auth/login']);
+    this.authService.logout();
   }
 } 

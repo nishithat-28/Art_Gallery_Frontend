@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable} from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
@@ -6,15 +6,21 @@ import {
   HttpInterceptor
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  //constructor(private authService: AuthService) {}
+  constructor() {}
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token = this.authService.getToken();
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const token = localStorage.getItem('token');
+    console.log('Auth Interceptor - Processing request:', {
+      url: request.url,
+      hasToken: !!token,
+      method: request.method
+    });
 
     if (token) {
       request = request.clone({
@@ -22,6 +28,9 @@ export class AuthInterceptor implements HttpInterceptor {
           Authorization: `Bearer ${token}`
         }
       });
+      console.log('Auth Interceptor - Added token to request');
+    } else {
+      console.warn('Auth Interceptor - No token available for request:', request.url);
     }
 
     return next.handle(request);

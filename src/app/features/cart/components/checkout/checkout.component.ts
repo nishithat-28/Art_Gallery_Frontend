@@ -126,7 +126,7 @@ export class CheckoutComponent implements OnInit {
         paymentMethod
       });
 
-      this.orderService.createOrder(this.cartItems, shippingAddress, paymentMethod).subscribe({
+      this.orderService.createOrder(shippingAddress, paymentMethod,this.cartItems).subscribe({
         next: (order: OrderResponseDto) => {
           console.log('Order created successfully:', order);
           this.cartService.clearCart().subscribe({

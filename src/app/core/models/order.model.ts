@@ -24,7 +24,6 @@ export interface OrderItemResponseDto {
 }
 
 export interface OrderCreateDto {
-  userId: number;
   shippingAddress: string;
   paymentMethod: string;
   orderItems: OrderItemDto[];

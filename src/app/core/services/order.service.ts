@@ -55,10 +55,18 @@ export class OrderService {
     private authService: AuthService
   ) {}
 
-  createOrder(cartItems: CartItem[], shippingAddress: string, paymentMethod: string): Observable<OrderResponseDto> {
+  createOrder(shippingAddress: string, paymentMethod: string, cartItems: CartItem[]): Observable<OrderResponseDto> {
+    console.log('Order Service - Starting order creation');
     return this.authService.currentUser$.pipe(
       switchMap(user => {
+        console.log('Order Service - Current user state:', user);
+        
         if (!user?.id) {
+          console.error('Order Service - User not authenticated:', {
+            user,
+            hasId: !!user?.id,
+            token: this.authService.getToken()
+          });
           throw new Error('User not authenticated');
         }
 
@@ -68,12 +76,12 @@ export class OrderService {
         }));
 
         const orderData: OrderCreateDto = {
-          userId: parseInt(user.id),
           shippingAddress,
           paymentMethod,
           orderItems
         };
 
+        console.log('Order Service - Sending order data:', orderData);
         return this.http.post<OrderResponseDto>(this.apiUrl, orderData);
       })
     );

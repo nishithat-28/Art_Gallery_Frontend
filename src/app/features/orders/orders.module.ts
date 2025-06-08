@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
 import { OrderListComponent } from './components/order-list/order-list.component';
-import { AuthGuard } from '../../core/auth/auth.guard';
 
 const routes: Routes = [
   {

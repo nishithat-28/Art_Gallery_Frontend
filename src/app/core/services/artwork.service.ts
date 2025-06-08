@@ -96,35 +96,4 @@ export class ArtworkService {
     return this.http.post<any>(`${this.apiUrl}/process-database-images`, {});
   }
 
-  // Mock data for development
-  getMockArtworks(): Artwork[] {
-    return [
-      {
-        id: 1,
-        title: 'Abstract Harmony',
-        description: 'A vibrant abstract painting exploring color and form.',
-        price: 1200,
-        imageUrl: 'assets/images/artwork1.jpg',
-        artist: 'Jane Smith',
-        category: 'Abstract',
-        categoryId: 1,
-        artistId: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: 2,
-        title: 'Mountain Sunset',
-        description: 'A serene landscape capturing the beauty of nature.',
-        price: 800,
-        imageUrl: 'assets/images/artwork2.jpg',
-        artist: 'John Doe',
-        category: 'Landscape',
-        categoryId: 2,
-        artistId: 2,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ];
-  }
 } 

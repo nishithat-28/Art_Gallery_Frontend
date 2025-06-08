@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ArtworkService, Artwork } from '../../../../core/services/artwork.service';
+import { ArtworkService} from '../../../../core/services/artwork.service';
+import { CategoryService } from 'src/app/core/services/category.service';
+import { Artwork } from 'src/app/core/models/artwork.model';
+import { Category } from 'src/app/core/models/category.model';
 
 @Component({
   selector: 'app-artwork-list',
@@ -51,11 +54,12 @@ import { ArtworkService, Artwork } from '../../../../core/services/artwork.servi
 export class ArtworkListComponent implements OnInit {
   artworks: Artwork[] = [];
   filteredArtworks: Artwork[] = [];
-  categories: string[] = [];
+  categories: Category[] = [];
   selectedCategory: string = '';
 
   constructor(
     private artworkService: ArtworkService,
+    private categoryService: CategoryService,
     private router: Router
   ) {}
 
@@ -77,7 +81,7 @@ export class ArtworkListComponent implements OnInit {
   }
 
   private loadCategories(): void {
-    this.artworkService.getCategories().subscribe({
+    this.categoryService.getCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
       },

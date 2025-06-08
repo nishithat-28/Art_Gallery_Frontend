@@ -7,13 +7,13 @@ import { AuthGuard } from 'src/app/core/guards/auth.guard';
 
 const routes: Routes = [
   {
-    path: '',
-    component: ArtworkListComponent
-  },
-  {
     path: 'sell-artwork',
     component: SellArtworkComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: '',
+    component: ArtworkListComponent
   },
   {
     path: ':id',

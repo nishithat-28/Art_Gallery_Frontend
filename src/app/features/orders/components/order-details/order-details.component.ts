@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { OrderService } from '../../../../core/services/order.service';
-import { NotificationService, NotificationPreferences } from '../../../../core/services/notification.service';
 import { OrderResponseDto, Address } from '../../../../core/models/order.model';
 
 @Component({
@@ -114,18 +113,11 @@ export class OrderDetailsComponent implements OnInit {
   loading = true;
   error: string | null = null;
   shippingAddress: Address | null = null;
-  notificationPreferences: NotificationPreferences = {
-    emailNotifications: true,
-    orderUpdates: true,
-    deliveryUpdates: true,
-    marketingEmails: false
-  };
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private orderService: OrderService,
-    private notificationService: NotificationService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -156,47 +148,8 @@ export class OrderDetailsComponent implements OnInit {
       }
     });
 
-    this.loadNotificationPreferences();
   }
 
-  private loadNotificationPreferences(): void {
-    this.notificationService.getNotificationPreferences().subscribe({
-      next: (preferences: NotificationPreferences) => {
-        this.notificationPreferences = preferences;
-      },
-      error: (error: unknown) => {
-        console.error('Error loading notification preferences:', error);
-        this.snackBar.open('Error loading notification preferences', 'Close', {
-          duration: 5000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-      }
-    });
-  }
-
-  updateNotificationPreferences(): void {
-    if (!this.notificationPreferences) return;
-
-    this.notificationService.updateNotificationPreferences(this.notificationPreferences).subscribe({
-      next: (preferences: NotificationPreferences) => {
-        this.notificationPreferences = preferences;
-        this.snackBar.open('Notification preferences updated', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-      },
-      error: (error: unknown) => {
-        console.error('Error updating notification preferences:', error);
-        this.snackBar.open('Error updating notification preferences', 'Close', {
-          duration: 5000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-      }
-    });
-  }
 
   cancelOrder(): void {
     if (!this.order) {

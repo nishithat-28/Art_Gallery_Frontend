@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ArtworkService } from 'src/app/core/services/artwork.service';
 
 @Component({
@@ -13,7 +14,8 @@ export class SellArtworkComponent {
 
   constructor(
     private fb: FormBuilder,
-    private artworkService: ArtworkService
+    private artworkService: ArtworkService,
+    private snackBar: MatSnackBar
   ) {
     this.artworkForm = this.fb.group({
       title: ['', Validators.required],
@@ -42,12 +44,20 @@ export class SellArtworkComponent {
 
     this.artworkService.createArtwork(formData).subscribe({
       next: () => {
-        alert('Artwork submitted successfully!');
+        this.snackBar.open('Artwork submitted successfully.', 'Close', {
+                duration: 5000,
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+        });
         this.artworkForm.reset();
       },
       error: (err) => {
         console.error('Error:', err);
-        alert('Failed to submit artwork.');
+        this.snackBar.open('Failed to submit artwork.', 'Close', {
+                duration: 5000,
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+        });
       }
     });
   }

@@ -6,23 +6,12 @@ import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 export interface User {
-  id: string;
+  id: number;
+  username: string,
   email: string;
   firstName: string;
   lastName: string;
   role: string;
-}
-
-export interface LoginDto {
-  email: string;
-  password: string;
-}
-
-export interface RegisterDto {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
 }
 
 export interface AuthResponse {
@@ -35,6 +24,7 @@ export interface AuthResponse {
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/Auth`;
+
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   private jwtHelper = new JwtHelperService();
@@ -46,52 +36,59 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {
-    this.loadStoredUser();
-  }
-
-  private loadStoredUser(): void {
     const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-
-    if (token && user && !this.jwtHelper.isTokenExpired(token)) {
-      this.currentUserSubject.next(JSON.parse(user));
-      this.isLoggedInSubject.next(true);
-    } else {
-      this.logout();
+    if (token) {
+      this.loadUserProfile();
     }
   }
 
-  login(loginDto: LoginDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, loginDto).pipe(
-      tap(response => {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        this.currentUserSubject.next(response.user);
-        this.isLoggedInSubject.next(true);
-      })
-    );
+  private loadUserProfile(): void {
+    this.http.get<User>(`${environment.apiUrl}/auth/profile`)
+      .subscribe({
+        next: (user) => this.currentUserSubject.next(user),
+        error: () => {
+          localStorage.removeItem('token');
+          this.currentUserSubject.next(null);
+        }
+      });
   }
 
-  register(registerDto: RegisterDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, registerDto).pipe(
+  login(username: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, { username, password })
+      .pipe(
+        tap(response => {
+          localStorage.setItem('token', response.token);
+          this.currentUserSubject.next(response.user);
+        })
+      );
+  }
+
+  register(username: string, email: string, password: string, firstName: string, lastName: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, {
+      username,
+      email,
+      password,
+      firstName,
+      lastName
+    }).pipe(
       tap(response => {
         localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
         this.currentUserSubject.next(response.user);
-        this.isLoggedInSubject.next(true);
       })
     );
   }
 
   logout(): void {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     this.currentUserSubject.next(null);
-    this.isLoggedInSubject.next(false);
-    this.router.navigate(['/']);
+    this.router.navigate(['/auth/login']);
   }
 
-  getUser(id: string): Observable<User> {
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getUser(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
 
