@@ -87,13 +87,6 @@ import { OrderResponseDto, Address } from '../../../../core/models/order.model';
               >
                 View Invoice
               </button>
-              <button
-                *ngIf="order.status === 'Pending'"
-                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                (click)="cancelOrder()"
-              >
-                Cancel Order
-              </button>
             </div>
           </div>
         </ng-container>
@@ -151,38 +144,6 @@ export class OrderDetailsComponent implements OnInit {
   }
 
 
-  cancelOrder(): void {
-    if (!this.order) {
-      this.snackBar.open('Order not found.', 'Close', {
-        duration: 5000,
-        horizontalPosition: 'end',
-        verticalPosition: 'top'
-      });
-      return;
-    }
-
-    if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(this.order.id.toString()).subscribe({
-        next: (updatedOrder) => {
-          this.order = updatedOrder;
-          this.snackBar.open('Order cancelled successfully.', 'Close', {
-            duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
-          });
-        },
-        error: (error) => {
-          console.error('Error cancelling order:', error);
-          this.snackBar.open('Error cancelling order. Please try again.', 'Close', {
-            duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
-          });
-        }
-      });
-    }
-  }
-
   printOrderDetails(): void {
     const printContent = document.getElementById('printTemplate');
     if (!printContent) return;
@@ -206,8 +167,6 @@ export class OrderDetailsComponent implements OnInit {
         return 'bg-green-100 text-green-800';
       case 'delivered':
         return 'bg-green-200 text-green-900';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -227,10 +186,9 @@ export class OrderDetailsComponent implements OnInit {
       .map(item => `${item.artWorkTitle} (${item.quantity})`)
       .join(', ');
   }
-
   viewInvoice(): void {
     if (!this.order) return;
-    // Navigate to invoice page
-    window.open(`/orders/${this.order.id}/invoice`, '_blank');
+    this.router.navigate(['/orders/invoice', this.order?.id]);
   }
+
 } 

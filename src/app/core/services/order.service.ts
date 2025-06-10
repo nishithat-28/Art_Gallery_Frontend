@@ -110,9 +110,6 @@ export class OrderService {
     return `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, ${address.country}`;
   }
 
-  cancelOrder(id: string): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/${id}/cancel`, {});
-  }
 
   getUserOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(`${this.apiUrl}/user`);

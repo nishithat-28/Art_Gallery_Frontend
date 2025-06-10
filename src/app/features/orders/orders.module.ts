@@ -5,24 +5,28 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
 import { OrderListComponent } from './components/order-list/order-list.component';
+import { OrderInvoiceComponent } from './components/order-invoice/order-invoice.component';
 
 const routes: Routes = [
   {
     path: '',
     component: OrderListComponent,
-    //canActivate: [AuthGuard]
   },
   {
     path: ':id',
     component: OrderDetailsComponent,
-    //canActivate: [AuthGuard]
+  },
+  {
+    path: 'invoice/:id',
+    component: OrderInvoiceComponent,
   }
 ];
 
 @NgModule({
   declarations: [
     OrderDetailsComponent,
-    OrderListComponent
+    OrderListComponent,
+    OrderInvoiceComponent
   ],
   imports: [
     CommonModule,

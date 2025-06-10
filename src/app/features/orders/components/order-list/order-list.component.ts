@@ -104,24 +104,6 @@ export class OrderListComponent implements OnInit {
         order.orderItems.some(item => item.artWorkTitle.toLowerCase().includes(search))
       );
     }
-
-    // Apply sorting
-    const sort = this.filterForm.get('sort')?.value;
-    filtered.sort((a, b) => {
-      switch (sort) {
-        case 'date-desc':
-          return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
-        case 'date-asc':
-          return new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime();
-        case 'amount-desc':
-          return b.totalAmount - a.totalAmount;
-        case 'amount-asc':
-          return a.totalAmount - b.totalAmount;
-        default:
-          return 0;
-      }
-    });
-
     this.filteredOrders = filtered;
   }
 
@@ -149,6 +131,7 @@ export class OrderListComponent implements OnInit {
   }
 
   viewInvoice(order: OrderResponseDto): void {
-    this.router.navigate(['/orders', order.id, 'invoice']);
+    if (!order) return;
+    this.router.navigate(['/orders/invoice', order?.id]);
   }
 } 
